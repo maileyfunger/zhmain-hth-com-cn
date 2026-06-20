@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>了解 ng28 — 服务平台简介</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f5f9fc;
+            color: #1f2b38;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* hero */
+        .hero {
+            background: linear-gradient(145deg, #e3f0f5 0%, #cbe2ea 100%);
+            padding: 4rem 0 3.5rem;
+            border-bottom: 1px solid rgba(0, 140, 145, 0.08);
+        }
+
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: #0a4452;
+            margin-bottom: 0.75rem;
+        }
+
+        .hero h1 em {
+            font-style: normal;
+            color: #008b8b;
+            font-weight: 550;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            max-width: 640px;
+            color: #2f4e5c;
+            margin-top: 0.6rem;
+        }
+
+        .hero-tagline {
+            display: inline-block;
+            background: rgba(0, 139, 139, 0.08);
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #0b5d66;
+            margin-top: 1.2rem;
+            backdrop-filter: blur(2px);
+        }
+
+        /* 网格卡片通用 */
+        .card-grid {
+            display: grid;
+            gap: 1.5rem;
+            padding: 3rem 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.8rem 1.5rem;
+            box-shadow: 0 2px 12px rgba(0, 80, 85, 0.04), 0 4px 6px rgba(0, 50, 55, 0.02);
+            border: 1px solid rgba(0, 140, 145, 0.06);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 24px rgba(0, 110, 115, 0.06);
+            border-color: rgba(0, 139, 139, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            font-weight: 510;
+            color: #0e4d5a;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h3::before {
+            content: "○";
+            font-size: 1rem;
+            color: #008b8b;
+            opacity: 0.7;
+        }
+
+        .card p {
+            font-size: 0.98rem;
+            color: #2f4956;
+        }
+
+        .card--accent {
+            background: #f1fafb;
+            border-left: 3px solid #1a9c9c;
+        }
+
+        /* 说明区 (带网格) */
+        .explain-section {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            margin: 1rem 0 2.5rem;
+            box-shadow: 0 2px 16px rgba(0, 90, 95, 0.02);
+        }
+
+        .explain-section h2 {
+            font-size: 1.8rem;
+            font-weight: 480;
+            color: #073e49;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .explain-section h2 span {
+            background: linear-gradient(120deg, #008b8b20, #008b8b08);
+            padding: 0 0.3rem;
+        }
+
+        .explain-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem 1.8rem;
+        }
+
+        .explain-item {
+            border-bottom: 1px solid #e3edf1;
+            padding-bottom: 1.2rem;
+        }
+
+        .explain-item strong {
+            display: block;
+            font-weight: 520;
+            color: #0b5a66;
+            margin-bottom: 0.2rem;
+            font-size: 1.06rem;
+        }
+
+        .explain-item p {
+            font-size: 0.96rem;
+            color: #345764;
+        }
+
+        /* FAQ摘要 */
+        .faq-summary {
+            padding: 2.5rem 0 1.5rem;
+        }
+
+        .faq-summary h2 {
+            font-size: 1.7rem;
+            font-weight: 470;
+            color: #0b4d59;
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .faq-summary h2::after {
+            content: "?";
+            font-size: 1.1rem;
+            background: #008b8b10;
+            padding: 0.1rem 0.7rem;
+            border-radius: 30px;
+            color: #008b8b;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 18px;
+            padding: 1.2rem 1.6rem;
+            margin-bottom: 1rem;
+            border: 1px solid #dde9ed;
+            transition: 0.1s;
+        }
+
+        .faq-item:hover {
+            border-color: #7ab8bb;
+        }
+
+        .faq-q {
+            font-weight: 500;
+            color: #0c505d;
+            margin-bottom: 0.2rem;
+            font-size: 1.02rem;
+        }
+
+        .faq-a {
+            font-size: 0.95rem;
+            color: #365a67;
+        }
+
+        .faq-more {
+            margin-top: 1.8rem;
+            text-align: right;
+            font-size: 0.9rem;
+            color: #1b7a82;
+        }
+
+        /* 底部 */
+        .footer-area {
+            border-top: 1px solid #d3e4ea;
+            padding: 2.5rem 0 3.5rem;
+            margin-top: 1.5rem;
+            background: #f2f8fb;
+        }
+
+        .footer-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+
+        .footer-col {
+            min-width: 140px;
+        }
+
+        .footer-col h5 {
+            font-weight: 510;
+            color: #10535f;
+            margin-bottom: 0.6rem;
+            font-size: 1rem;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col li {
+            margin-bottom: 0.35rem;
+            font-size: 0.9rem;
+            color: #34616e;
+        }
+
+        .footer-col a {
+            color: #2d7d87;
+            text-decoration: none;
+            transition: 0.1s;
+            border-bottom: 1px dotted transparent;
+        }
+
+        .footer-col a:hover {
+            border-bottom-color: #008b8b;
+            color: #006d6d;
+        }
+
+        .copyright {
+            margin-top: 2.5rem;
+            font-size: 0.8rem;
+            color: #5a7a84;
+            text-align: center;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero {
+                padding: 2.5rem 0 2rem;
+            }
+
+            .explain-grid {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                flex-direction: column;
+                gap: 1.8rem;
+            }
+
+            .faq-item {
+                padding: 1rem 1.2rem;
+            }
+
+            .explain-section {
+                padding: 1.8rem 1.2rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .card-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* 点缀 */
+        .accent-badge {
+            background: #008b8b08;
+            border-radius: 50px;
+            padding: 0.2rem 0.8rem;
+            color: #008b8b;
+            font-size: 0.8rem;
+        }
+
+        .inline-link {
+            color: #1a7a82;
+            font-weight: 450;
+            text-decoration: none;
+            border-bottom: 1px solid #008b8b30;
+            transition: 0.15s;
+        }
+
+        .inline-link:hover {
+            border-bottom-color: #008b8b;
+            color: #015a5a;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- hero 区 -->
+    <section class="hero">
+        <div class="container">
+            <h1>关于 <em>ng28</em> 的简明介绍</h1>
+            <p>
+                如果你正在寻找一个可以快速了解的平台，这里梳理了服务定位、常见用途以及基础信息，帮助你判断是否与自己的需求匹配。
+            </p>
+            <div class="hero-tagline">▸ 从用户视角出发 · 中立概述</div>
+        </div>
+    </section>
+
+    <!-- 优势区：网格卡片 -->
+    <div class="container">
+        <div class="card-grid">
+            <div class="card card--accent">
+                <h3>清晰路径</h3>
+                <p>无论你是首次接触还是希望重新确认，<a href="https://officials-ng28.com" class="inline-link">ng28</a> 的界面结构都倾向于直白，减少不必要的跳转步骤。</p>
+            </div>
+            <div class="card">
+                <h3>信息聚合</h3>
+                <p>功能模块相对集中，用户无需在多个页面之间来回切换即可了解服务概貌，适合快速浏览与初期评估。</p>
+            </div>
+            <div class="card">
+                <h3>持续迭代</h3>
+                <p>从公开信息看，平台会定期调整细节与内容结构，保持与用户习惯的同步，不僵化于固定模板。</p>
+            </div>
+            <div class="card">
+                <h3>轻量入口</h3>
+                <p>无需繁琐注册即可访问大部分说明内容，降低了解门槛。对于只想先看一看的使用者而言比较友好。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 说明区：详细介绍用途与场景 -->
+    <div class="container">
+        <div class="explain-section">
+            <h2><span>▍</span> 从用途出发：<strong style="font-weight:450;color:#0b5d66;">ng28</strong> 适合哪些情况？</h2>
+            <div class="explain-grid">
+                <div class="explain-item">
+                    <strong>快速识别服务范围</strong>
+                    <p>通过首页的导航与分类标签，用户可以在十几秒内判断该平台是否涵盖自己关心的领域，节省筛选时间。</p>
+                </div>
+                <div class="explain-item">
+                    <strong>常用功能指引</strong>
+                    <p>页面中提供了多种功能入口的描述，初次使用时可以对照说明找到对应操作区域，减少迷茫感。</p>
+                </div>
+                <div class="explain-item">
+                    <strong>场景参考</strong>
+                    <p>例如信息查询、账户管理或内容浏览——平台针对不同场景设计了差异化的页面布局，尽量贴合用户预期。</p>
+                </div>
+                <div class="explain-item">
+                    <strong>辅助判断</strong>
+                    <p>如果你正在对比不同平台，<a href="https://officials-ng28.com" class="inline-link">ng28</a> 的公开信息结构可以作为参考之一，帮助你更理性地做决定。</p>
+                </div>
+            </div>
+            <div style="margin-top:1.8rem;font-size:0.95rem;background:#e9f3f6;padding:0.8rem 1.2rem;border-radius:40px;display:inline-block;">
+                ⚡ 建议：先浏览整体分类，再深入具体模块。
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ 摘要 -->
+    <div class="container faq-summary">
+        <h2>常见疑问摘要</h2>
+        <div class="faq-item">
+            <div class="faq-q">这个平台主要面向哪类用户？</div>
+            <div class="faq-a">从界面与内容来看，它适合希望快速获取服务概览、不希望在复杂菜单中摸索的普通使用者。</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">是否需要下载专用应用？</div>
+            <div class="faq-a">目前主要通过浏览器直接访问，不需要额外安装客户端，适配移动端与桌面端。</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">网站信息更新频率如何？</div>
+            <div class="faq-a">根据页面记录，部分说明与模块会不定期调整，建议以实际显示为准。</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">如何确认自己找到的是正确页面？</div>
+            <div class="faq-a">直接通过浏览器访问 <a href="https://officials-ng28.com" class="inline-link">ng28</a> 即可看到最新版本，避免使用第三方转载内容。</div>
+        </div>
+        <div class="faq-more">—— 更具体的问题建议在实际页面中进一步查阅 ——</div>
+    </div>
+
+    <!-- 底部链接 -->
+    <footer class="footer-area">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h5>导航参考</h5>
+                    <ul>
+                        <li>首页</li>
+                        <li>功能概览</li>
+                        <li>常见问题</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h5>服务说明</h5>
+                    <ul>
+                        <li>使用指引</li>
+                        <li>条款与隐私</li>
+                        <li>联系渠道</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h5>直接前往</h5>
+                    <ul>
+                        <li><a href="https://officials-ng28.com">ng28</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 页面仅为介绍用途 · 内容基于公开信息整理 · 与官方保持独立
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
